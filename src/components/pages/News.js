@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import NewsItem from "./NewsItem";
 import { Button } from "@material-tailwind/react";
+import Spinner from "../Spinner";
 
 export default class News extends Component {
   constructor() {
@@ -14,13 +15,14 @@ export default class News extends Component {
 
   // It's output will be shown after render() method
   async componentDidMount() {
-    let apiUrl =
-      "https://newsapi.org/v2/top-headlines?country=us&apiKey=d59c6e90f9624b55941a603a87667a49&page=1&pageSize=18";
+    let apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=d59c6e90f9624b55941a603a87667a49&page=1&pageSize=${this.props.pageSize}`;
+    this.setState({ loading: true });
     let data = await fetch(apiUrl);
     let parsedData = await data.json();
     this.setState({
       articles: parsedData.articles,
       totalResults: parsedData.totalResults,
+      loading: false,
     });
   }
 
@@ -28,43 +30,50 @@ export default class News extends Component {
     // console.log("Prev click");
     let apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=d59c6e90f9624b55941a603a87667a49&page=${
       this.state.page - 1
-    }&pageSize=18`;
+    }&pageSize=${this.props.pageSize}`;
+    this.setState({ loading: true }); //show loading
     let data = await fetch(apiUrl);
     let parsedData = await data.json();
     this.setState({
       page: this.state.page - 1,
       articles: parsedData.articles,
+      loading: false,
     });
   };
 
   handleNextClick = async () => {
-    console.log("pageNumb:" + Math.ceil(this.state.totalResults / 18));
-    console.log("page:" + this.state.page + 1);
-    let pageNumber = Math.ceil(this.state.totalResults / 18);
-    if (this.state.page + 1 > pageNumber) {
-      // Show Nothing
-    } else {
+    // console.log("pageNumb:" + Math.ceil(this.state.totalResults / this.props.pageSize));
+    // console.log("page:" + this.state.page + 1);
+    let pageNumber = Math.ceil(this.state.totalResults / this.props.pageSize);
+    if (!(this.state.page + 1 > pageNumber)) {
       let apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=d59c6e90f9624b55941a603a87667a49&page=${
         this.state.page + 1
-      }&pageSize=18`;
+      }&pageSize=${this.props.pageSize}`;
+      this.setState({ loading: true }); //show loading
       let data = await fetch(apiUrl);
       let parsedData = await data.json();
       this.setState({
         page: this.state.page + 1,
         articles: parsedData.articles,
+        loading: false,
       });
     }
   };
 
   render() {
     const currentPageNum = this.state.page + 1;
-    const totalPageNum = Math.ceil(this.state.totalResults / 18);
+    const totalPageNum = Math.ceil(
+      this.state.totalResults / this.props.pageSize
+    );
 
     return (
       <section className="text-gray-600 container">
         <div className="py-24">
+          {/* if loading = true then show */}
+          {this.state.loading && <Spinner />}
+
           <div className="flex flex-wrap -m-4">
-            {this.state.articles.map((article) => {
+            {!this.state.loading && this.state.articles.map((article) => {
               return (
                 <NewsItem
                   title={article.title ? article.title.slice(0, 60) : ""}
@@ -93,7 +102,7 @@ export default class News extends Component {
             >
               &larr; &nbsp; Previous
             </Button>
-            
+
             <Button
               disabled={currentPageNum > totalPageNum}
               onClick={this.handleNextClick}

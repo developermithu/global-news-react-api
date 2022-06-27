@@ -8,7 +8,7 @@ function App() {
       <TheHeader />
       {/* <Home/> */}
 
-      <News/>
+      <News pageSize="18"/>
 
       <TheFooter />
     </>
