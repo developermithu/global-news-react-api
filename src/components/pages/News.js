@@ -27,7 +27,7 @@ export default class News extends Component {
   }
 
   async updateNews() {
-    let apiUrl = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=d59c6e90f9624b55941a603a87667a49&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    let apiUrl = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     this.setState({ loading: true });
     let data = await fetch(apiUrl);
     let parsedData = await data.json();
@@ -69,8 +69,8 @@ export default class News extends Component {
       this.state.totalResults / this.props.pageSize
     );
 
-    console.log("current " + currentPageNum);
-    console.log("total " + totalPageNum);
+    // console.log("current " + currentPageNum);
+    // console.log("total " + totalPageNum);
 
     return (
       <section className="text-gray-600 container">
